@@ -1,0 +1,3 @@
+1,Admin,Adminovic,1234567890123,M,Adresa 1,123456789,admin,admin,ADMINISTRATOR
+2,Petar,Petrovic,2234567890123,M,Adresa 2,234567890,petar,petar123,PATIENT
+3,Jovan,Jovanovic,3234567890123,M,Adresa 3,345678901,jovan,jovan123,DOCTOR
