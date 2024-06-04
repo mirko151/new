@@ -28,33 +28,33 @@ public class AppointmentManagementFrame extends JFrame {
     }
 
     private void initialize() {
-        setTitle("Appointment Management");
+        setTitle("Upravljanje terminima");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new BorderLayout());
 
-        // Table
-        String[] columnNames = {"ID", "Doctor", "Patient", "Date", "Status", "Therapy Description"};
+        // Tabela
+        String[] columnNames = {"ID", "Doktor", "Pacijent", "Datum", "Status", "Opis terapije"};
         tableModel = new DefaultTableModel(columnNames, 0);
         appointmentTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(appointmentTable);
 
-        // Load appointments into the table
+        // Učitavanje termina u tabelu
         loadAppointments();
 
-        // Buttons
+        // Dugmad
         JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Add Appointment");
-        JButton editButton = new JButton("Edit Appointment");
-        JButton deleteButton = new JButton("Delete Appointment");
+        JButton addButton = new JButton("Dodaj termin");
+        JButton editButton = new JButton("Izmeni termin");
+        JButton deleteButton = new JButton("Obriši termin");
 
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
 
-        // Button actions
+        // Akcije dugmadi
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -73,7 +73,7 @@ public class AppointmentManagementFrame extends JFrame {
                         new AppointmentFormFrame(appointmentService, appointment, doctors, patients, AppointmentManagementFrame.this).setVisible(true);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(AppointmentManagementFrame.this, "Please select an appointment to edit.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(AppointmentManagementFrame.this, "Molimo izaberite termin za izmenu.", "Greška", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -84,14 +84,14 @@ public class AppointmentManagementFrame extends JFrame {
                 int selectedRow = appointmentTable.getSelectedRow();
                 if (selectedRow >= 0) {
                     String appointmentId = (String) tableModel.getValueAt(selectedRow, 0);
-                    int confirmation = JOptionPane.showConfirmDialog(AppointmentManagementFrame.this, "Are you sure you want to delete this appointment?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+                    int confirmation = JOptionPane.showConfirmDialog(AppointmentManagementFrame.this, "Da li ste sigurni da želite da obrišete ovaj termin?", "Potvrda brisanja", JOptionPane.YES_NO_OPTION);
                     if (confirmation == JOptionPane.YES_OPTION) {
                         appointmentService.getAllAppointments().removeIf(a -> a.getId().equals(appointmentId));
                         appointmentService.saveAppointments();
                         loadAppointments();
                     }
                 } else {
-                    JOptionPane.showMessageDialog(AppointmentManagementFrame.this, "Please select an appointment to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(AppointmentManagementFrame.this, "Molimo izaberite termin za brisanje.", "Greška", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -103,7 +103,7 @@ public class AppointmentManagementFrame extends JFrame {
     }
 
     public void loadAppointments() {
-        tableModel.setRowCount(0);  // Clear the table
+        tableModel.setRowCount(0);  // Očistiti tabelu
         List<Appointment> appointments = appointmentService.getAllAppointments();
         for (Appointment appointment : appointments) {
             Object[] row = new Object[]{
@@ -118,14 +118,14 @@ public class AppointmentManagementFrame extends JFrame {
         }
     }
 
-    // Main method for running AppointmentManagementFrame
+    // Glavna metoda za pokretanje AppointmentManagementFrame
     public static void main(String[] args) {
         String userFilePath = "users.txt";
         String appointmentFilePath = "appointments.txt";
 
         UserService userService = new UserService(userFilePath);
 
-        // Get doctors and patients
+        // Dobijanje doktora i pacijenata
         List<Doctor> doctors = userService.getUsers().stream()
                 .filter(u -> u instanceof Doctor)
                 .map(u -> (Doctor) u)

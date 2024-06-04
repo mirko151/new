@@ -1,0 +1,115 @@
+// AppointmentFormFrame.java
+package gui;
+
+import model.Appointment;
+import model.AppointmentStatus;
+import model.Doctor;
+import model.Patient;
+import service.AppointmentService;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.util.List;
+
+public class AppointmentFormFrame extends JFrame {
+    private AppointmentService appointmentService;
+    private Appointment appointment;
+    private List<Doctor> doctors;
+    private List<Patient> patients;
+    private AppointmentManagementFrame parentFrame;
+    
+    private JTextField idField, dateField, therapyDescriptionField;
+    private JComboBox<String> doctorComboBox, patientComboBox, statusComboBox;
+
+    public AppointmentFormFrame(AppointmentService appointmentService, Appointment appointment, List<Doctor> doctors, List<Patient> patients, AppointmentManagementFrame parentFrame) {
+        this.appointmentService = appointmentService;
+        this.appointment = appointment;
+        this.doctors = doctors;
+        this.patients = patients;
+        this.parentFrame = parentFrame;
+        initialize();
+    }
+
+    private void initialize() {
+        setTitle(appointment == null ? "Dodaj termin" : "Izmeni termin");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel(new GridLayout(7, 2));
+        
+        panel.add(new JLabel("ID:"));
+        idField = new JTextField(appointment == null ? "" : appointment.getId());
+        panel.add(idField);
+
+        panel.add(new JLabel("Doktor:"));
+        doctorComboBox = new JComboBox<>();
+        for (Doctor doctor : doctors) {
+            doctorComboBox.addItem(doctor.getId() + " - " + doctor.getLastName());
+        }
+        panel.add(doctorComboBox);
+
+        panel.add(new JLabel("Pacijent:"));
+        patientComboBox = new JComboBox<>();
+        for (Patient patient : patients) {
+            patientComboBox.addItem(patient.getId() + " - " + patient.getLastName());
+        }
+        panel.add(patientComboBox);
+
+        panel.add(new JLabel("Datum (YYYY-MM-DD):"));
+        dateField = new JTextField(appointment == null ? "" : appointment.getDate().toString());
+        panel.add(dateField);
+
+        panel.add(new JLabel("Status:"));
+        statusComboBox = new JComboBox<>(new String[]{"AVAILABLE", "SCHEDULED", "CANCELLED"});
+        if (appointment != null) {
+            statusComboBox.setSelectedItem(appointment.getStatus().name());
+        }
+        panel.add(statusComboBox);
+
+        panel.add(new JLabel("Opis terapije:"));
+        therapyDescriptionField = new JTextField(appointment == null ? "" : appointment.getTherapyDescription());
+        panel.add(therapyDescriptionField);
+
+        JButton saveButton = new JButton("Sačuvaj");
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveAppointment();
+            }
+        });
+        panel.add(saveButton);
+
+        add(panel);
+    }
+
+    private void saveAppointment() {
+        // Validacija podataka
+        if (idField.getText().isEmpty() || dateField.getText().isEmpty() || therapyDescriptionField.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Molimo popunite sva polja.", "Greška", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        String id = idField.getText();
+        Doctor doctor = doctors.get(doctorComboBox.getSelectedIndex());
+        Patient patient = patients.get(patientComboBox.getSelectedIndex());
+        LocalDate date = LocalDate.parse(dateField.getText());
+        AppointmentStatus status = AppointmentStatus.valueOf(statusComboBox.getSelectedItem().toString());
+        String therapyDescription = therapyDescriptionField.getText();
+
+        Appointment newAppointment = new Appointment(id, doctor, patient, date, status, therapyDescription);
+
+        if (appointment == null) {
+            appointmentService.addAppointment(newAppointment);
+        } else {
+            appointmentService.updateAppointment(newAppointment);
+        }
+
+        appointmentService.saveAppointments();
+        parentFrame.loadAppointments();
+        dispose();
+    }
+}

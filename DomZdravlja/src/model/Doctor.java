@@ -18,6 +18,4 @@ public class Doctor extends User {
     public void setAppointments(List<Appointment> appointments) {
         this.appointments = appointments;
     }
-
-    // Dodatne metode specifične za doktora mogu se dodati ovde
 }

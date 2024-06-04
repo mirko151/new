@@ -68,6 +68,7 @@ public class Appointment {
     public void setTherapyDescription(String therapyDescription) {
         this.therapyDescription = therapyDescription;
     }
+
     public String toCSV() {
         String patientId = patient != null ? patient.getId() : "";
         return String.join(",", id, doctor.getId(), patientId, date.toString(), status.name(), therapyDescription);
@@ -76,14 +77,26 @@ public class Appointment {
     public static Appointment fromCSV(String csv, List<Doctor> doctors, List<Patient> patients) {
         String[] values = csv.split(",");
         if (values.length != 6) {
-            throw new IllegalArgumentException("Invalid CSV format for Appointment");
+            throw new IllegalArgumentException("Invalid CSV format for Appointment: " + csv);
         }
         String id = values[0];
         Doctor doctor = doctors.stream().filter(d -> d.getId().equals(values[1])).findFirst().orElse(null);
-        Patient patient = patients.stream().filter(p -> p.getId().equals(values[2])).findFirst().orElse(null);
+        if (doctor == null) {
+            throw new IllegalArgumentException("Doctor not found for ID: " + values[1]);
+        }
+        Patient patient = null;
+        if (!values[2].isEmpty()) {
+            patient = patients.stream().filter(p -> p.getId().equals(values[2])).findFirst().orElse(null);
+            if (patient == null) {
+                System.out.println("Patient not found for ID: " + values[2]);
+            }
+        }
         LocalDate date = LocalDate.parse(values[3]);
         AppointmentStatus status = AppointmentStatus.valueOf(values[4]);
         String therapyDescription = values[5];
+
+        // Dodaj debag informacije za proveru
+        System.out.println("Appointment parsed: ID=" + id + ", DoctorID=" + (doctor != null ? doctor.getId() : "null") + ", PatientID=" + (patient != null ? patient.getId() : "null") + ", Date=" + date + ", Status=" + status + ", TherapyDescription=" + therapyDescription);
 
         return new Appointment(id, doctor, patient, date, status, therapyDescription);
     }

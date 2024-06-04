@@ -1,3 +1,4 @@
+// User.java
 package model;
 
 public abstract class User {
@@ -105,9 +106,11 @@ public abstract class User {
     public void setRole(UserRole role) {
         this.role = role;
     }
+
     public String toCSV() {
         return String.join(",", id, firstName, lastName, jmbg, gender, address, phoneNumber, username, password, role.name());
     }
+
     public static User fromCSV(String csv) {
         String[] values = csv.split(",");
         if (values.length != 10) {
@@ -136,4 +139,3 @@ public abstract class User {
         }
     }
 }
-

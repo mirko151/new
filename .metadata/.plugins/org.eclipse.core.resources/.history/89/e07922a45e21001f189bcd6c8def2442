@@ -1,0 +1,145 @@
+// PatientManagementFrame.java
+package gui;
+
+import model.Appointment;
+import model.AppointmentStatus;
+import model.Patient;
+import service.AppointmentService;
+import service.UserService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class PatientManagementFrame extends JFrame {
+    private Patient patient;
+    private UserService userService;
+    private AppointmentService appointmentService;
+    private JTable appointmentTable;
+    private DefaultTableModel tableModel;
+
+    public PatientManagementFrame(Patient patient, UserService userService, AppointmentService appointmentService) {
+        this.patient = patient;
+        this.userService = userService;
+        this.appointmentService = appointmentService;
+        initialize();
+    }
+
+    private void initialize() {
+        setTitle("Upravljanje terminima - Pacijent");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel label = new JLabel("Dobrodošli, " + patient.getFirstName() + " " + patient.getLastName());
+        panel.add(label, BorderLayout.NORTH);
+
+        // Tabela
+        String[] columnNames = {"ID", "Doktor", "Datum", "Status", "Opis terapije"};
+        tableModel = new DefaultTableModel(columnNames, 0);
+        appointmentTable = new JTable(tableModel);
+        JScrollPane scrollPane = new JScrollPane(appointmentTable);
+
+        // Učitavanje termina u tabelu
+        loadAppointments();
+
+        // Dugmad
+        JPanel buttonPanel = new JPanel();
+        JButton scheduleButton = new JButton("Zakaži termin");
+        JButton cancelButton = new JButton("Otkaži termin");
+
+        buttonPanel.add(scheduleButton);
+        buttonPanel.add(cancelButton);
+
+        // Akcije dugmadi
+        scheduleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                scheduleAppointment();
+            }
+        });
+
+        cancelButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cancelAppointment();
+            }
+        });
+
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+
+        add(panel);
+    }
+
+    private void scheduleAppointment() {
+        // Logika za zakazivanje termina
+        List<Appointment> availableAppointments = appointmentService.getAllAppointments().stream()
+                .filter(a -> a.getStatus() == AppointmentStatus.AVAILABLE)
+                .collect(Collectors.toList());
+
+        if (availableAppointments.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Nema dostupnih termina za zakazivanje.", "Obaveštenje", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        String[] options = availableAppointments.stream()
+                .map(a -> a.getId() + " - " + a.getDoctor().getLastName() + " - " + a.getDate())
+                .toArray(String[]::new);
+
+        String selected = (String) JOptionPane.showInputDialog(this, "Izaberite termin za zakazivanje:", "Zakazivanje termina",
+                JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+
+        if (selected != null) {
+            String selectedId = selected.split(" - ")[0];
+            Appointment appointment = availableAppointments.stream().filter(a -> a.getId().equals(selectedId)).findFirst().orElse(null);
+            if (appointment != null) {
+                appointment.setPatient(patient);
+                appointment.setStatus(AppointmentStatus.SCHEDULED);
+                appointmentService.updateAppointment(appointment);
+                loadAppointments();
+            }
+        }
+    }
+
+    private void cancelAppointment() {
+        int selectedRow = appointmentTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            String appointmentId = (String) tableModel.getValueAt(selectedRow, 0);
+            Appointment appointment = appointmentService.getAllAppointments().stream().filter(a -> a.getId().equals(appointmentId)).findFirst().orElse(null);
+            if (appointment != null && appointment.getStatus() == AppointmentStatus.SCHEDULED && appointment.getDate().isAfter(LocalDate.now())) {
+                int confirmation = JOptionPane.showConfirmDialog(this, "Da li ste sigurni da želite da otkažete ovaj termin?", "Potvrda otkazivanja", JOptionPane.YES_NO_OPTION);
+                if (confirmation == JOptionPane.YES_OPTION) {
+                    appointment.setStatus(AppointmentStatus.CANCELLED);
+                    appointmentService.updateAppointment(appointment);
+                    loadAppointments();
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Termin ne može biti otkazan.", "Greška", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Molimo izaberite termin za otkazivanje.", "Greška", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void loadAppointments() {
+        tableModel.setRowCount(0);  // Očistiti tabelu
+        List<Appointment> appointments = appointmentService.getAppointmentsForPatient(patient);
+        for (Appointment appointment : appointments) {
+            Object[] row = new Object[]{
+                    appointment.getId(),
+                    appointment.getDoctor().getLastName(),
+                    appointment.getDate(),
+                    appointment.getStatus(),
+                    appointment.getTherapyDescription()
+            };
+            tableModel.addRow(row);
+        }
+    }
+}

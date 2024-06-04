@@ -1,0 +1,107 @@
+package gui;
+
+import model.Appointment;
+import model.Patient;
+import service.AppointmentService;
+import service.UserService;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.List;
+
+public class PatientManagementFrame extends JFrame {
+    private Patient patient;
+    private UserService userService;
+    private AppointmentService appointmentService;
+    private JTable appointmentTable;
+    private DefaultTableModel appointmentTableModel;
+
+    public PatientManagementFrame(Patient patient, UserService userService, AppointmentService appointmentService) {
+        this.patient = patient;
+        this.userService = userService;
+        this.appointmentService = appointmentService;
+        initialize();
+    }
+
+    private void initialize() {
+        setTitle("Upravljanje pacijentom");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel(new BorderLayout());
+        JLabel label = new JLabel("Dobrodošli, " + patient.getFirstName() + " " + patient.getLastName());
+        panel.add(label, BorderLayout.NORTH);
+
+        // Tabela termina
+        String[] columnNames = {"ID", "Doktor", "Datum", "Status", "Opis terapije"};
+        appointmentTableModel = new DefaultTableModel(columnNames, 0);
+        appointmentTable = new JTable(appointmentTableModel);
+        JScrollPane scrollPane = new JScrollPane(appointmentTable);
+
+        loadAppointments();
+
+        panel.add(scrollPane, BorderLayout.CENTER);
+
+        // Dugme nazad
+        JButton backButton = new JButton("← Nazad");
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new LoginFrame(userService).setVisible(true);
+                dispose();
+            }
+        });
+        panel.add(backButton, BorderLayout.SOUTH);
+
+        add(panel);
+    }
+
+    public void loadAppointments() {
+        appointmentTableModel.setRowCount(0);  // Očistiti tabelu
+        List<Appointment> appointments = appointmentService.getAppointmentsForPatient(patient);
+        for (Appointment appointment : appointments) {
+            Object[] row = new Object[]{
+                    appointment.getId(),
+                    appointment.getDoctor() != null ? appointment.getDoctor().getLastName() : "",
+                    appointment.getDate(),
+                    appointment.getStatus(),
+                    appointment.getTherapyDescription()
+            };
+            appointmentTableModel.addRow(row);
+        }
+    }
+
+    // Glavna metoda za pokretanje frejma
+    public static void main(String[] args) {
+        String userFilePath = "users.txt";
+        String appointmentFilePath = "appointments.txt";
+
+        UserService userService = new UserService(userFilePath);
+
+        // Dobijanje doktora i pacijenata
+        List<Doctor> doctors = userService.getUsers().stream()
+                .filter(u -> u instanceof Doctor)
+                .map(u -> (Doctor) u)
+                .collect(Collectors.toList());
+        List<Patient> patients = userService.getUsers().stream()
+                .filter(u -> u instanceof Patient)
+                .map(u -> (Patient) u)
+                .collect(Collectors.toList());
+
+        AppointmentService appointmentService = new AppointmentService(appointmentFilePath, doctors, patients);
+
+        // Pronalaženje pacijenta za testiranje
+        Patient patient = patients.get(0);  // Pretpostavimo da postoji bar jedan pacijent
+
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new PatientManagementFrame(patient, userService, appointmentService).setVisible(true);
+            }
+        });
+    }
+}

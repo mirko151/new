@@ -1,10 +1,9 @@
+// AppointmentService.java
 package service;
 
 import model.Appointment;
 import model.Doctor;
 import model.Patient;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class AppointmentService {
@@ -23,45 +22,38 @@ public class AppointmentService {
     public void addAppointment(Appointment appointment) {
         for (Appointment a : appointments) {
             if (a.getId().equals(appointment.getId())) {
-                throw new IllegalArgumentException("Appointment ID already exists!");
+                throw new IllegalArgumentException("ID termina već postoji!");
             }
         }
         appointments.add(appointment);
-        FileService.writeAppointmentsToFile(filePath, appointments);
+        saveAppointments();
     }
 
     public void updateAppointment(Appointment appointment) {
         for (int i = 0; i < appointments.size(); i++) {
             if (appointments.get(i).getId().equals(appointment.getId())) {
                 appointments.set(i, appointment);
-                FileService.writeAppointmentsToFile(filePath, appointments);
+                saveAppointments();
                 return;
             }
         }
-        throw new IllegalArgumentException("Appointment not found!");
+        throw new IllegalArgumentException("Termin nije pronađen!");
     }
 
     public List<Appointment> getAppointmentsForDoctor(Doctor doctor) {
-        List<Appointment> doctorAppointments = new ArrayList<>();
-        for (Appointment appointment : appointments) {
-            if (appointment.getDoctor().equals(doctor)) {
-                doctorAppointments.add(appointment);
-            }
-        }
-        return doctorAppointments;
+        return appointments.stream().filter(a -> a.getDoctor().equals(doctor)).toList();
     }
 
     public List<Appointment> getAppointmentsForPatient(Patient patient) {
-        List<Appointment> patientAppointments = new ArrayList<>();
-        for (Appointment appointment : appointments) {
-            if (appointment.getPatient().equals(patient)) {
-                patientAppointments.add(appointment);
-            }
-        }
-        return patientAppointments;
+        return appointments.stream().filter(a -> a.getPatient().equals(patient)).toList();
     }
 
     public List<Appointment> getAllAppointments() {
         return appointments;
+    }
+
+    // Dodavanje metode saveAppointments
+    public void saveAppointments() {
+        FileService.writeAppointmentsToFile(filePath, appointments);
     }
 }

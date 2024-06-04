@@ -18,6 +18,4 @@ public class Patient extends User {
     public void setMedicalRecord(List<Appointment> medicalRecord) {
         this.medicalRecord = medicalRecord;
     }
-
-    // Dodatne metode specifične za pacijenta mogu se dodati ovde
 }

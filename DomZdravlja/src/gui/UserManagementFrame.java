@@ -1,3 +1,4 @@
+// UserManagementFrame.java
 package gui;
 
 import model.Administrator;
@@ -22,33 +23,33 @@ public class UserManagementFrame extends JFrame {
     }
 
     private void initialize() {
-        setTitle("User Management");
+        setTitle("Upravljanje korisnicima");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panel = new JPanel(new BorderLayout());
 
-        // Table
-        String[] columnNames = {"ID", "First Name", "Last Name", "JMBG", "Gender", "Address", "Phone Number", "Username", "Role"};
+        // Tabela
+        String[] columnNames = {"ID", "Ime", "Prezime", "JMBG", "Pol", "Adresa", "Broj telefona", "Korisničko ime", "Uloga"};
         tableModel = new DefaultTableModel(columnNames, 0);
         userTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(userTable);
 
-        // Load users into the table
+        // Učitavanje korisnika u tabelu
         loadUsers();
 
-        // Buttons
+        // Dugmad
         JPanel buttonPanel = new JPanel();
-        JButton addButton = new JButton("Add User");
-        JButton editButton = new JButton("Edit User");
-        JButton deleteButton = new JButton("Delete User");
+        JButton addButton = new JButton("Dodaj korisnika");
+        JButton editButton = new JButton("Izmeni korisnika");
+        JButton deleteButton = new JButton("Obriši korisnika");
 
         buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
 
-        // Button actions
+        // Akcije dugmadi
         addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -67,7 +68,7 @@ public class UserManagementFrame extends JFrame {
                         new UserFormFrame(userService, user, UserManagementFrame.this).setVisible(true);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(UserManagementFrame.this, "Please select a user to edit.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(UserManagementFrame.this, "Molimo izaberite korisnika za izmenu.", "Greška", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -78,14 +79,14 @@ public class UserManagementFrame extends JFrame {
                 int selectedRow = userTable.getSelectedRow();
                 if (selectedRow >= 0) {
                     String userId = (String) tableModel.getValueAt(selectedRow, 0);
-                    int confirmation = JOptionPane.showConfirmDialog(UserManagementFrame.this, "Are you sure you want to delete this user?", "Confirm Delete", JOptionPane.YES_NO_OPTION);
+                    int confirmation = JOptionPane.showConfirmDialog(UserManagementFrame.this, "Da li ste sigurni da želite da obrišete ovog korisnika?", "Potvrda brisanja", JOptionPane.YES_NO_OPTION);
                     if (confirmation == JOptionPane.YES_OPTION) {
                         userService.getUsers().removeIf(u -> u.getId().equals(userId));
                         userService.saveUsers();
                         loadUsers();
                     }
                 } else {
-                    JOptionPane.showMessageDialog(UserManagementFrame.this, "Please select a user to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(UserManagementFrame.this, "Molimo izaberite korisnika za brisanje.", "Greška", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -97,7 +98,7 @@ public class UserManagementFrame extends JFrame {
     }
 
     public void loadUsers() {
-        tableModel.setRowCount(0);  // Clear the table
+        tableModel.setRowCount(0);  // Očistiti tabelu
         List<User> users = userService.getUsers();
         for (User user : users) {
             Object[] row = new Object[]{
@@ -115,7 +116,7 @@ public class UserManagementFrame extends JFrame {
         }
     }
 
-    // Main method for running UserManagementFrame
+    // Glavna metoda za pokretanje UserManagementFrame
     public static void main(String[] args) {
         String userFilePath = "users.txt";
 
