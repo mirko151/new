@@ -260,7 +260,7 @@ public class AdministratorManagementFrame extends JFrame {
 
         AppointmentService appointmentService = new AppointmentService(appointmentFilePath, doctors, patients);
 
-        // Dodajemo testne korisnike ako ih nema (u stvarnom slučaju, korisnici bi se učitali iz fajla)
+        // Dodajemo testne korisnike ako ih nema ()
         if (userService.getUsers().isEmpty()) {
             userService.addUser(new Administrator("1", "Admin", "Adminovic", "1234567890123", "M", "Adresa 1", "123456789", "admin", "admin"));
             userService.addUser(new Doctor("2", "Doctor", "Doctorovic", "1234567890124", "F", "Adresa 2", "123456780", "doctor", "doctor"));

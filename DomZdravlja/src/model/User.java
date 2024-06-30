@@ -1,4 +1,3 @@
-// User.java
 package model;
 
 public abstract class User {
@@ -12,6 +11,7 @@ public abstract class User {
     protected String username;
     protected String password;
     protected UserRole role;
+    protected boolean deleted;
 
     public User(String id, String firstName, String lastName, String jmbg, String gender, String address, String phoneNumber, String username, String password, UserRole role) {
         this.id = id;
@@ -24,6 +24,7 @@ public abstract class User {
         this.username = username;
         this.password = password;
         this.role = role;
+        this.deleted = false;
     }
 
     // Getters and Setters
@@ -107,13 +108,21 @@ public abstract class User {
         this.role = role;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
     public String toCSV() {
-        return String.join(",", id, firstName, lastName, jmbg, gender, address, phoneNumber, username, password, role.name());
+        return String.join(",", id, firstName, lastName, jmbg, gender, address, phoneNumber, username, password, role.name(), String.valueOf(deleted));
     }
 
     public static User fromCSV(String csv) {
         String[] values = csv.split(",");
-        if (values.length != 10) {
+        if (values.length != 10 && values.length != 11) {
             throw new IllegalArgumentException("Invalid CSV format for User");
         }
         String id = values[0];
@@ -126,16 +135,23 @@ public abstract class User {
         String username = values[7];
         String password = values[8];
         UserRole role = UserRole.valueOf(values[9]);
+        boolean deleted = values.length == 11 ? Boolean.parseBoolean(values[10]) : false;
 
+        User user;
         switch (role) {
             case ADMINISTRATOR:
-                return new Administrator(id, firstName, lastName, jmbg, gender, address, phoneNumber, username, password);
+                user = new Administrator(id, firstName, lastName, jmbg, gender, address, phoneNumber, username, password);
+                break;
             case PATIENT:
-                return new Patient(id, firstName, lastName, jmbg, gender, address, phoneNumber, username, password);
+                user = new Patient(id, firstName, lastName, jmbg, gender, address, phoneNumber, username, password);
+                break;
             case DOCTOR:
-                return new Doctor(id, firstName, lastName, jmbg, gender, address, phoneNumber, username, password);
+                user = new Doctor(id, firstName, lastName, jmbg, gender, address, phoneNumber, username, password);
+                break;
             default:
                 throw new IllegalArgumentException("Unknown user role");
         }
+        user.setDeleted(deleted);
+        return user;
     }
 }

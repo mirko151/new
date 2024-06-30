@@ -1,10 +1,11 @@
-// AppointmentService.java
 package service;
 
 import model.Appointment;
 import model.Doctor;
 import model.Patient;
+
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AppointmentService {
     private List<Appointment> appointments;
@@ -41,18 +42,23 @@ public class AppointmentService {
     }
 
     public List<Appointment> getAppointmentsForDoctor(Doctor doctor) {
-        return appointments.stream().filter(a -> a.getDoctor().equals(doctor)).toList();
+        return appointments.stream()
+                .filter(a -> !a.isDeleted() && a.getDoctor().equals(doctor))
+                .collect(Collectors.toList());
     }
 
     public List<Appointment> getAppointmentsForPatient(Patient patient) {
-        return appointments.stream().filter(a -> a.getPatient().equals(patient)).toList();
+        return appointments.stream()
+                .filter(a -> !a.isDeleted() && a.getPatient() != null && a.getPatient().equals(patient))
+                .collect(Collectors.toList());
     }
 
     public List<Appointment> getAllAppointments() {
-        return appointments;
+        return appointments.stream()
+                .filter(appointment -> !appointment.isDeleted())
+                .collect(Collectors.toList());
     }
 
-    // Dodavanje metode saveAppointments
     public void saveAppointments() {
         FileService.writeAppointmentsToFile(filePath, appointments);
     }

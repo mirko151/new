@@ -10,6 +10,7 @@ public class Appointment {
     private LocalDate date;
     private AppointmentStatus status;
     private String therapyDescription;
+    private boolean deleted;
 
     public Appointment(String id, Doctor doctor, Patient patient, LocalDate date, AppointmentStatus status, String therapyDescription) {
         this.id = id;
@@ -18,6 +19,17 @@ public class Appointment {
         this.date = date;
         this.status = status;
         this.therapyDescription = therapyDescription;
+        this.deleted = false;
+    }
+
+    public Appointment(String id, Doctor doctor, Patient patient, LocalDate date, AppointmentStatus status, String therapyDescription, boolean deleted) {
+        this.id = id;
+        this.doctor = doctor;
+        this.patient = patient;
+        this.date = date;
+        this.status = status;
+        this.therapyDescription = therapyDescription;
+        this.deleted = deleted;
     }
 
     // Getters and Setters
@@ -69,14 +81,22 @@ public class Appointment {
         this.therapyDescription = therapyDescription;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
     public String toCSV() {
         String patientId = patient != null ? patient.getId() : "";
-        return String.join(",", id, doctor.getId(), patientId, date.toString(), status.name(), therapyDescription);
+        return String.join(",", id, doctor.getId(), patientId, date.toString(), status.name(), therapyDescription, String.valueOf(deleted));
     }
 
     public static Appointment fromCSV(String csv, List<Doctor> doctors, List<Patient> patients) {
         String[] values = csv.split(",");
-        if (values.length != 6) {
+        if (values.length != 7) {
             throw new IllegalArgumentException("Invalid CSV format for Appointment: " + csv);
         }
         String id = values[0];
@@ -94,10 +114,8 @@ public class Appointment {
         LocalDate date = LocalDate.parse(values[3]);
         AppointmentStatus status = AppointmentStatus.valueOf(values[4]);
         String therapyDescription = values[5];
+        boolean deleted = Boolean.parseBoolean(values[6]);
 
-        // Dodaj debag informacije za proveru
-        System.out.println("Appointment parsed: ID=" + id + ", DoctorID=" + (doctor != null ? doctor.getId() : "null") + ", PatientID=" + (patient != null ? patient.getId() : "null") + ", Date=" + date + ", Status=" + status + ", TherapyDescription=" + therapyDescription);
-
-        return new Appointment(id, doctor, patient, date, status, therapyDescription);
+        return new Appointment(id, doctor, patient, date, status, therapyDescription, deleted);
     }
 }

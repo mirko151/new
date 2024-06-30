@@ -1,1 +1,6 @@
-1,3,2,2024-11-01,AVAILABLE,aa
+1,3,2,2024-07-01,SCHEDULED,Pacijent se žali na glavobolju,false
+2,3,,2024-07-02,AVAILABLE,,false
+3,3,2,2024-07-03,CANCELLED,Pacijent otkazao pregled,false
+4,5,2,2024-07-04,SCHEDULED,Pacijent se žali na bolove u stomaku,true
+5,3,2,2024-07-05,SCHEDULED,Kontrola nakon operacije,false
+6,3,2,2024-07-10,AVAILABLE,aaas,false

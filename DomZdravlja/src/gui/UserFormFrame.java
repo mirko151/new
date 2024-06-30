@@ -127,6 +127,10 @@ public class UserFormFrame extends JFrame {
             String password = new String(passwordField.getPassword());
             UserRole role = (UserRole) roleComboBox.getSelectedItem();
 
+            if (firstName.isEmpty() || lastName.isEmpty() || jmbg.isEmpty() || address.isEmpty() || phoneNumber.isEmpty() || username.isEmpty() || password.isEmpty()) {
+                throw new IllegalArgumentException("Sva polja su obavezna!");
+            }
+
             if (user == null) {
                 User newUser;
                 switch (role) {

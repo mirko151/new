@@ -1,10 +1,9 @@
 package service;
 
-import model.Doctor;
 import model.User;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserService {
     private List<User> users;
@@ -13,15 +12,14 @@ public class UserService {
     public UserService(String filePath) {
         this.filePath = filePath;
         this.users = FileService.readUsersFromFile(filePath);
-        // Dodajemo debag informacije
-        for (User user : users) {
-            if (user instanceof Doctor) {
-                System.out.println("Loaded doctor: " + user.getId());
-            }
-        }
     }
 
     public void addUser(User user) {
+        for (User u : users) {
+            if (u.getId().equals(user.getId())) {
+                throw new IllegalArgumentException("ID korisnika već postoji!");
+            }
+        }
         for (User u : users) {
             if (u.getUsername().equals(user.getUsername())) {
                 throw new IllegalArgumentException("Username already exists!");
@@ -56,6 +54,6 @@ public class UserService {
     }
 
     public List<User> getUsers() {
-        return users;
+        return users.stream().filter(user -> !user.isDeleted()).collect(Collectors.toList());
     }
 }

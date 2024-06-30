@@ -1,3 +1,6 @@
-1,Admin,Adminovic,1234567890123,M,Adresa 1,123456789,admin,admin,ADMINISTRATOR
-2,Petar,Petrovic,2234567890123,M,Adresa 2,234567890,petar,petar123,PATIENT
-3,Jovan,Jovanovic,3234567890123,M,Adresa 3,345678901,jovan,jovan123,DOCTOR
+1,Admin,Adminovic,1234567890123,M,Adresa 1,123456789,admin,admin,ADMINISTRATOR,false
+2,Petar,Petrovic,2234567890123,M,Adresa 2,234567890,petar,petar123,PATIENT,false
+3,Jovan,Jovanovic,3234567890123,M,Adresa 3,345678901,jovan,jovan123,DOCTOR,false
+4,Milan,Milic,4234567890123,M,Adresa 4,456789012,milan,milan123,PATIENT,true
+5,Jelena,Jelic,5234567890123,F,Adresa 5,567890123,jelena,jelena123,DOCTOR,false
+6,aa,aa,1223,M,sdasd,0666,a,a,ADMINISTRATOR,false
