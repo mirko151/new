@@ -48,6 +48,7 @@ public class DoctorManagementFrame extends JFrame {
 
         panel.add(scrollPane, BorderLayout.CENTER);
 
+        // Dugmad
         JPanel buttonPanel = new JPanel();
         JButton addButton = new JButton("Dodaj termin");
         JButton editButton = new JButton("Izmeni termin");
