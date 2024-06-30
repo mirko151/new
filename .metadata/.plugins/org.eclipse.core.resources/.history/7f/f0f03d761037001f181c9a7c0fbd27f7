@@ -54,7 +54,7 @@ public class LoginFrame extends JFrame {
 
         add(panel);
     }
-    
+
     private void handleLogin() {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
@@ -75,14 +75,14 @@ public class LoginFrame extends JFrame {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    
+
     private List<Doctor> getDoctors() {
         return userService.getUsers().stream()
                 .filter(u -> u instanceof Doctor)
                 .map(u -> (Doctor) u)
                 .collect(Collectors.toList());
     }
-    
+
     private List<Patient> getPatients() {
         return userService.getUsers().stream()
                 .filter(u -> u instanceof Patient)

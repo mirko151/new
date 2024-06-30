@@ -27,6 +27,7 @@ public abstract class User {
         this.deleted = false;
     }
 
+    // Getters and Setters
     public String getId() {
         return id;
     }
